@@ -1,0 +1,30 @@
+{
+  "name": "emo-gauge",
+  "version": "1.0.0",
+  "description": "**EmoGauge** is a groundbreaking tool designed to help **freelancers**, **solopreneurs**, and **recruiters** become more self-aware of the emotional impact of their writing. In today's fast-paced digital communication landscape, the way we convey emotions can have a profound effect on relationships, business outcomes, and personal growth. EmoGauge offers real-time sentiment analysis of written content, helping you understand not only how your words are perceived but also how your emotional expression evolves over time.",
+  "main": "webpack.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cosminmemetea/emo-gauge.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cosminmemetea/emo-gauge/issues"
+  },
+  "homepage": "https://github.com/cosminmemetea/emo-gauge#readme",
+  "dependencies": {
+    "axios": "^1.7.7"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.25.2",
+    "@babel/preset-env": "^7.25.4",
+    "babel-loader": "^9.2.1",
+    "webpack": "^5.95.0",
+    "webpack-cli": "^5.1.4"
+  }
+}

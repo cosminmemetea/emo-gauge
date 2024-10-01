@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EmoGauge - Sentiment Analyzer</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <h2>EmoGauge</h2>
+  <p>Enter text to analyze sentiment:</p>
+  
+  <!-- Input Text Area -->
+  <textarea id="inputText" rows="4" cols="30"></textarea>
+  <br>
+  
+  <!-- Analyze Button -->
+  <button id="analyzeButton">Analyze Sentiment</button>
+  
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="spinner hidden"></div>
+
+  <!-- Result Section -->
+  <div id="result" class="hidden">
+    <p>Model Used: <span id="modelUsed"></span></p>
+    <p id="sentimentLabel" class="sentiment-label">Sentiment: <span id="sentimentResult"></span></p>
+    <p>Confidence: <span id="confidence"></span>%</p>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

@@ -1,0 +1,31 @@
+{
+  "manifest_version": 3,
+  "name": "EmoGauge - Sentiment Awareness",
+  "description": "Analyze sentiment in any text input on any website to become more self-aware.",
+  "version": "1.0",
+  "permissions": [
+    "activeTab",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "dist/background.js" 
+  },
+  "action": {
+    "default_popup": "public/popup.html",
+    "default_icon": {
+      "16": "public/icons/icon16.png",
+      "48": "public/icons/icon48.png",
+      "128": "public/icons/icon128.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["dist/contentScript.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "host_permissions": [
+    "https://x-vibes.onrender.com/*"
+  ]
+}
