@@ -1,6 +1,67 @@
-// Function to send text and model to the sentiment analysis API
-async function analyzeSentiment(text, model) {
-  try {
+// Function to create and inject the floating panel (like a sidebar) into the webpage
+function createFloatingPanel() {
+  // Create the floating panel container
+  const panel = document.createElement('div');
+  panel.id = 'floatingPanel';
+  panel.style.position = 'fixed';
+  panel.style.top = '20px';
+  panel.style.right = '20px';
+  panel.style.width = '320px';
+  panel.style.height = 'auto';
+  panel.style.backgroundColor = '#ffffff';
+  panel.style.border = '2px solid #4CAF50';
+  panel.style.borderRadius = '8px';
+  panel.style.padding = '15px';
+  panel.style.zIndex = '9999';
+  panel.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+  panel.style.fontFamily = 'Arial, sans-serif';
+
+  // Create the inner HTML structure of the panel
+  panel.innerHTML = `
+    <div style="text-align: right;">
+      <button id="closePanel" style="background-color: transparent; border: none; font-size: 18px; cursor: pointer;">✖</button>
+    </div>
+    <h3 style="color: #4CAF50; text-align: center;">EmoGauge Sentiment Analyzer</h3>
+    <textarea id="inputText" rows="4" placeholder="Enter your text..." style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; margin-bottom: 15px; resize: none;"></textarea>
+    <button id="analyzeButton" style="width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Analyze Sentiment</button>
+    <div id="loadingSpinner" class="spinner hidden" style="margin: 15px 0;"></div>
+    <div id="result" class="hidden" style="text-align: center; margin-top: 10px;">
+      <p>Model Used: <span id="modelUsed"></span></p>
+      <p class="sentiment-label">Sentiment: <span id="sentimentResult"></span></p>
+      <p>Confidence: <span id="confidence"></span>%</p>
+    </div>
+  `;
+
+  // Append the floating panel to the body
+  document.body.appendChild(panel);
+
+  // Close button functionality
+  document.getElementById('closePanel').addEventListener('click', () => {
+    panel.remove();
+  });
+
+  // Add event listener to the analyze button
+  document.getElementById('analyzeButton').addEventListener('click', async () => {
+    const text = document.getElementById('inputText').value.trim();
+    const resultDiv = document.getElementById('result');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    // Show error if no text entered
+    if (text === '') {
+      resultDiv.innerHTML = '<p style="color: red;">Please enter some text!</p>';
+      resultDiv.classList.remove('hidden');
+      return;
+    }
+
+    // Show loading spinner, hide result section
+    loadingSpinner.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    
+    // Disable input and analyze button
+    document.getElementById('analyzeButton').disabled = true;
+    document.getElementById('inputText').disabled = true;
+
+    // Perform sentiment analysis (API call)
     const response = await fetch('https://x-vibes.onrender.com/predict', {
       method: 'POST',
       headers: {
@@ -9,77 +70,37 @@ async function analyzeSentiment(text, model) {
       },
       body: JSON.stringify({
         text: text,
-        model: model
+        model: 'distilbert' // Default model
       })
     });
     const data = await response.json();
-    return data.result;
-  } catch (error) {
-    console.error('Error analyzing sentiment:', error);
-    return 'Error';
-  }
-}
 
-// Function to add an "Analyze" button and a model selector next to input fields
-function addAnalyzeButton(inputElement) {
-  // Create the "Analyze Sentiment" button
-  const analyzeButton = document.createElement('button');
-  analyzeButton.textContent = 'Analyze Sentiment';
-  analyzeButton.style.marginLeft = '10px';
-  analyzeButton.style.padding = '5px';
-  analyzeButton.style.fontSize = '12px';
+    // Hide loading spinner
+    loadingSpinner.classList.add('hidden');
+    
+    // Enable input and analyze button again
+    document.getElementById('analyzeButton').disabled = false;
+    document.getElementById('inputText').disabled = false;
 
-  // Create a dropdown to select the model
-  const modelSelect = document.createElement('select');
-  modelSelect.style.marginLeft = '10px';
-  modelSelect.innerHTML = `
-    <option value="bert">BERT</option>
-    <option value="roberta">RoBERTa</option>
-    <option value="distilbert">DistilBERT</option>
-  `;
+    // Display the sentiment analysis result
+    resultDiv.classList.remove('hidden');
+    document.getElementById('modelUsed').textContent = data.model_used;
+    document.getElementById('sentimentResult').textContent = data.result.label;
+    document.getElementById('confidence').textContent = (data.result.score * 100).toFixed(2);
 
-  // Create a div to display the result of the sentiment analysis
-  const resultDiv = document.createElement('div');
-  resultDiv.style.marginTop = '5px';
-  resultDiv.style.fontSize = '12px';
-
-  // Insert the dropdown, button, and result div next to the input field
-  inputElement.parentNode.insertBefore(modelSelect, inputElement.nextSibling);
-  inputElement.parentNode.insertBefore(analyzeButton, modelSelect.nextSibling);
-  inputElement.parentNode.insertBefore(resultDiv, analyzeButton.nextSibling);
-
-  // Add an event listener to the button
-  analyzeButton.addEventListener('click', async function () {
-    const text = inputElement.value;
-    const selectedModel = modelSelect.value;
-
-    if (text) {
-      const sentiment = await analyzeSentiment(text, selectedModel);
-      resultDiv.textContent = `Sentiment: ${sentiment}`;
-
-      // Update the background color of the input field based on the sentiment
-      if (sentiment === 'POSITIVE') {
-        inputElement.style.backgroundColor = '#d4edda'; // Green for positive
-      } else if (sentiment === 'NEGATIVE') {
-        inputElement.style.backgroundColor = '#f8d7da'; // Red for negative
-      } else {
-        inputElement.style.backgroundColor = '#fff3cd'; // Yellow for neutral
-      }
+    // Color the sentiment label
+    const sentimentResult = document.getElementById('sentimentResult');
+    if (data.result.label === 'POSITIVE') {
+      sentimentResult.style.color = 'green';
+    } else if (data.result.label === 'NEGATIVE') {
+      sentimentResult.style.color = 'red';
     } else {
-      resultDiv.textContent = 'Please enter some text.';
+      sentimentResult.style.color = 'goldenrod';
     }
   });
 }
 
-// Function to find all input fields and textareas
-function findInputFields() {
-  const textInputs = document.querySelectorAll('input[type="text"], textarea');
-
-  // Add the "Analyze Sentiment" button and model selector to each input field
-  textInputs.forEach(input => {
-    addAnalyzeButton(input);
-  });
-}
-
-// Run the script when the document is fully loaded
-window.addEventListener('load', findInputFields);
+// Function to inject the floating panel when the page is fully loaded
+window.addEventListener('load', () => {
+  createFloatingPanel();
+});
