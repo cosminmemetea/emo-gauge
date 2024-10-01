@@ -9,29 +9,30 @@ function createFloatingPanel() {
   panel.style.width = '320px';
   panel.style.height = 'auto';
   panel.style.maxHeight = '80vh'; // Ensure it doesn't exceed the window height
-  panel.style.backgroundColor = '#ffffff';
-  panel.style.border = '2px solid #4CAF50';
-  panel.style.borderRadius = '8px';
+  panel.style.backgroundColor = 'rgba(30, 30, 30, 0.8)'; // Nano transparent, dark futuristic theme
+  panel.style.border = '1px solid rgba(255, 255, 255, 0.5)';
+  panel.style.borderRadius = '12px';
   panel.style.padding = '15px';
   panel.style.zIndex = '9999';
-  panel.style.boxShadow = '0 4px 12px rgba(0,0,0,0.1)';
+  panel.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
   panel.style.fontFamily = 'Arial, sans-serif';
+  panel.style.color = '#fff';
   panel.style.transition = 'width 0.3s, height 0.3s'; // For smooth resizing
 
   // Create the inner HTML structure of the panel
   panel.innerHTML = `
     <div style="text-align: right;">
-      <button id="minimizePanel" style="background-color: transparent; border: none; font-size: 18px; cursor: pointer;">−</button>
-      <button id="closePanel" style="background-color: transparent; border: none; font-size: 18px; cursor: pointer;">✖</button>
+      <button id="minimizePanel" style="background-color: transparent; border: none; font-size: 18px; color: #fff; cursor: pointer;">−</button>
+      <button id="closePanel" style="background-color: transparent; border: none; font-size: 18px; color: #fff; cursor: pointer;">✖</button>
     </div>
-    <h3 style="color: #4CAF50; text-align: center;">EmoGauge</h3>
-    <select id="modelSelector" style="width: 100%; padding: 10px; margin-bottom: 15px;">
+    <h3 style="color: #00ffcc; text-align: center; font-family: 'Roboto', sans-serif;">EmoGauge</h3>
+    <select id="modelSelector" style="width: 100%; padding: 10px; margin-bottom: 15px; background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid #00ffcc;">
       <option value="distilbert">DistilBERT</option>
       <option value="bert">BERT</option>
       <option value="roberta">RoBERTa</option>
     </select>
-    <textarea id="inputText" rows="4" placeholder="Enter your text..." style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #ccc; margin-bottom: 15px; resize: none;"></textarea>
-    <button id="analyzeButton" style="width: 100%; padding: 10px; background-color: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Analyze Sentiment</button>
+    <textarea id="inputText" rows="4" placeholder="Enter your text..." style="width: 100%; padding: 10px; border-radius: 4px; border: 1px solid #00ffcc; background-color: rgba(255, 255, 255, 0.1); color: #fff; margin-bottom: 15px; resize: none; max-height: 100px;"></textarea>
+    <button id="analyzeButton" style="width: 100%; padding: 10px; background-color: #00ffcc; color: black; border: none; border-radius: 5px; font-size: 16px; cursor: pointer;">Analyze Sentiment</button>
     <div id="loadingSpinner" class="spinner hidden" style="margin: 15px 0;"></div>
     <div id="result" class="hidden" style="text-align: center; margin-top: 10px;">
       <p>Model Used: <span id="modelUsed"></span></p>
@@ -78,11 +79,9 @@ function createFloatingPanel() {
       return;
     }
 
-    // Show loading spinner, hide result section
+    // Show loading spinner, hide result section, lock inputs and button
     loadingSpinner.classList.remove('hidden');
     resultDiv.classList.add('hidden');
-
-    // Disable input and analyze button
     document.getElementById('analyzeButton').disabled = true;
     document.getElementById('inputText').disabled = true;
     document.getElementById('modelSelector').disabled = true;
@@ -103,7 +102,7 @@ function createFloatingPanel() {
 
     // Hide loading spinner
     loadingSpinner.classList.add('hidden');
-
+    
     // Enable input and analyze button again
     document.getElementById('analyzeButton').disabled = false;
     document.getElementById('inputText').disabled = false;
