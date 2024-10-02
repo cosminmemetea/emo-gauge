@@ -1,4 +1,4 @@
-// Initialize state
+// Initialize state variables
 let panelActive = false;
 let floatingPanel;
 let isMinimized = false;
@@ -14,20 +14,21 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true;
 });
 
+// Function to create or toggle the floating panel
 function toggleOrCreatePanel() {
     if (!panelActive || !document.getElementById('floatingPanel')) {
-        createFloatingPanel();
+        createFloatingPanel(); // Create the panel if it doesn't exist
     } else {
-        floatingPanel.style.display = floatingPanel.style.display === 'none' ? 'block' : 'none';
+        floatingPanel.style.display = floatingPanel.style.display === 'none' ? 'block' : 'none'; // Toggle visibility
     }
-    panelActive = !panelActive;
+    panelActive = !panelActive; // Update panel state
 }
 
+// Function to create the floating panel
 function createFloatingPanel() {
-    if (document.getElementById('floatingPanel')) {
-        return;
-    }
+    if (document.getElementById('floatingPanel')) return; // If already created, return
 
+    // Create the floating panel container
     floatingPanel = document.createElement('div');
     floatingPanel.id = 'floatingPanel';
     floatingPanel.role = 'dialog';
@@ -51,6 +52,7 @@ function createFloatingPanel() {
         transition: transform 0.3s ease, opacity 0.3s ease, height 0.3s ease, padding 0.3s ease;
     `;
 
+    // Panel HTML content
     floatingPanel.innerHTML = `
         <div style="text-align: right; display: flex; justify-content: flex-end;">
             <button id="minimizePanel" style="background: transparent; border: none; font-size: 18px; color: #fff; cursor: pointer;">−</button>
@@ -64,7 +66,7 @@ function createFloatingPanel() {
         </select>
         <textarea id="inputText" rows="4" placeholder="Enter your text..." style="width: calc(100% - 20px); height: 100px; padding: 10px; border-radius: 4px; border: 1px solid #00ffff; background-color: rgba(255, 255, 255, 0.1); color: #fff; margin-bottom: 15px; resize: vertical; max-height: 150px;"></textarea>
         <button id="analyzeButton" style="width: 100%; padding: 10px; background-color: #00ffff; color: #141414; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">Analyze Sentiment</button>
-        <div id="loadingSpinner" class="spinner" style="margin: 15px auto; border: 5px solid #f3f3f3; border-top: 5px solid #00ffff; border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; display: none; opacity: 0; transition: opacity 0.3s ease;"></div>
+        <div id="loadingSpinner" class="spinner hidden" style="margin: 15px auto; border: 5px solid #f3f3f3; border-top: 5px solid #00ffff; border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; display: none; opacity: 0; transition: opacity 0.3s ease;"></div>
         <div id="result" class="hidden" style="text-align: center; margin-top: 10px;">
             <p>Model Used: <span id="modelUsed"></span></p>
             <p class="sentiment-label">Sentiment: <span id="sentimentResult"></span></p>
@@ -74,35 +76,42 @@ function createFloatingPanel() {
 
     document.body.appendChild(floatingPanel);
 
-    // Event listeners for panel controls
+    // Event listeners for closing and minimizing the panel
     document.getElementById('closePanel').addEventListener('click', () => {
         floatingPanel.remove();
         panelActive = false;
     });
 
     document.getElementById('minimizePanel').addEventListener('click', () => {
-        if (!isMinimized) {
-            floatingPanel.dataset.originalHeight = floatingPanel.style.height;
-            floatingPanel.style.height = '40px';
-            floatingPanel.style.padding = '5px 15px';
-            floatingPanel.style.overflow = 'hidden';
-            floatingPanel.querySelector('h3').style.display = 'none';
-            document.querySelector('#floatingPanel > div').style.display = 'flex';
-            document.getElementById('minimizePanel').textContent = '⤢';
-            isMinimized = true;
-        } else {
-            floatingPanel.style.height = floatingPanel.dataset.originalHeight || 'auto';
-            floatingPanel.style.padding = '15px';
-            floatingPanel.style.overflow = 'visible';
-            floatingPanel.querySelector('h3').style.display = 'block';
-            document.getElementById('minimizePanel').textContent = '−';
-            isMinimized = false;
-        }
+        togglePanelMinimize();
     });
 
+    // Add event listener for sentiment analysis
     document.getElementById('analyzeButton').addEventListener('click', analyzeSentiment);
 }
 
+// Function to toggle panel minimize/maximize
+function togglePanelMinimize() {
+    if (!isMinimized) {
+        floatingPanel.dataset.originalHeight = floatingPanel.style.height;
+        floatingPanel.style.height = '40px';
+        floatingPanel.style.padding = '5px 15px';
+        floatingPanel.style.overflow = 'hidden';
+        floatingPanel.querySelector('h3').style.display = 'none';
+        document.querySelector('#floatingPanel > div').style.display = 'flex';
+        document.getElementById('minimizePanel').textContent = '⤢';
+        isMinimized = true;
+    } else {
+        floatingPanel.style.height = floatingPanel.dataset.originalHeight || 'auto';
+        floatingPanel.style.padding = '15px';
+        floatingPanel.style.overflow = 'visible';
+        floatingPanel.querySelector('h3').style.display = 'block';
+        document.getElementById('minimizePanel').textContent = '−';
+        isMinimized = false;
+    }
+}
+
+// Function to handle sentiment analysis
 function analyzeSentiment() {
     const text = document.getElementById('inputText').value.trim();
     const selectedModel = document.getElementById('modelSelector').value;
@@ -110,12 +119,14 @@ function analyzeSentiment() {
     const loadingSpinner = document.getElementById('loadingSpinner');
     const analyzeButton = document.getElementById('analyzeButton');
 
+    // Error if no text entered
     if (text === '') {
         resultDiv.innerHTML = '<p style="color: red;">Please enter some text!</p>';
         resultDiv.classList.remove('hidden');
         return;
     }
 
+    // Show loading spinner and disable UI elements
     loadingSpinner.style.display = 'block';
     loadingSpinner.style.opacity = '1';
     analyzeButton.disabled = true;
@@ -123,20 +134,23 @@ function analyzeSentiment() {
     document.getElementById('modelSelector').disabled = true;
     resultDiv.classList.add('hidden');
 
+    // Fetch sentiment analysis result
     fetch('https://x-vibes.onrender.com/predict', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({text, model: selectedModel})
+        body: JSON.stringify({ text, model: selectedModel })
     })
     .then(response => response.json())
     .then(data => {
+        // Display the results
         resultDiv.classList.remove('hidden');
         document.getElementById('modelUsed').textContent = data.model_used;
         document.getElementById('sentimentResult').textContent = data.result.label;
         document.getElementById('confidence').textContent = (data.result.score * 100).toFixed(2);
 
+        // Color the sentiment label based on result
         const sentimentResult = document.getElementById('sentimentResult');
         if (data.result.label === 'POSITIVE') {
             sentimentResult.style.color = 'green';
@@ -152,15 +166,16 @@ function analyzeSentiment() {
         resultDiv.classList.remove('hidden');
     })
     .finally(() => {
+        // Hide the spinner and enable UI elements
         loadingSpinner.style.opacity = '0';
-        setTimeout(() => loadingSpinner.style.display = 'none', 300); // Wait for opacity transition to end
+        setTimeout(() => loadingSpinner.style.display = 'none', 300); // Wait for transition to end
         analyzeButton.disabled = false;
         document.getElementById('inputText').disabled = false;
         document.getElementById('modelSelector').disabled = false;
     });
 }
 
-// Debounce resize event for responsive design
+// Debounce function for responsive panel resizing
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -172,6 +187,7 @@ function debounce(func, wait) {
     };
 }
 
+// Adjust the panel layout on window resize
 window.addEventListener('resize', debounce(adjustPanelLayout, 250));
 
 function adjustPanelLayout() {
