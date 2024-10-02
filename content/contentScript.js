@@ -17,57 +17,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // Function to create or toggle the floating panel
 function toggleOrCreatePanel() {
     if (!panelActive || !document.getElementById('floatingPanel')) {
-        createFloatingPanel(); // Create the panel if it doesn't exist
+        createFloatingPanel();
     } else {
         floatingPanel.style.display = floatingPanel.style.display === 'none' ? 'block' : 'none'; // Toggle visibility
     }
-    panelActive = !panelActive; // Update panel state
+    panelActive = !panelActive;
 }
 
 // Function to create the floating panel
 function createFloatingPanel() {
-    if (document.getElementById('floatingPanel')) return; // If already created, return
+    if (document.getElementById('floatingPanel')) return;
 
     // Create the floating panel container
     floatingPanel = document.createElement('div');
     floatingPanel.id = 'floatingPanel';
     floatingPanel.role = 'dialog';
     floatingPanel.setAttribute('aria-labelledby', 'emoGaugeTitle');
-    floatingPanel.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        width: 320px;
-        max-width: 90vw;
-        max-height: 80vh;
-        background-color: rgba(20, 20, 30, 0.95);
-        border: 1px solid rgba(0, 255, 255, 0.5);
-        border-radius: 12px;
-        padding: 15px;
-        z-index: 2147483647;
-        box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
-        font-family: 'Roboto', Arial, sans-serif;
-        color: #fff;
-        overflow: hidden;
-        transition: transform 0.3s ease, opacity 0.3s ease, height 0.3s ease, padding 0.3s ease;
-    `;
+    floatingPanel.classList.add('floating-panel');
 
     // Panel HTML content
     floatingPanel.innerHTML = `
-        <div style="text-align: right; display: flex; justify-content: flex-end;">
-            <button id="minimizePanel" style="background: transparent; border: none; font-size: 18px; color: #fff; cursor: pointer;">−</button>
-            <button id="closePanel" style="background: transparent; border: none; font-size: 18px; color: #fff; cursor: pointer;">✖</button>
+        <div class="panel-header">
+            <button id="minimizePanel" class="panel-button">−</button>
+            <button id="closePanel" class="panel-button">✖</button>
         </div>
-        <h3 id="emoGaugeTitle" style="color: #00ffff; text-align: center; font-family: 'Roboto', sans-serif; text-shadow: 0 0 5px rgba(0, 255, 255, 0.8); display: block;">EmoGauge</h3>
-        <select id="modelSelector" style="width: 100%; padding: 10px; margin-bottom: 15px; background-color: rgba(255, 255, 255, 0.1); color: #fff; border: 1px solid #00ffff;">
+        <h3 id="emoGaugeTitle" class="panel-title">EmoGauge</h3>
+        <select id="modelSelector" class="model-selector">
             <option value="distilbert">DistilBERT</option>
             <option value="bert">BERT</option>
             <option value="roberta">RoBERTa</option>
         </select>
-        <textarea id="inputText" rows="4" placeholder="Enter your text..." style="width: calc(100% - 20px); height: 100px; padding: 10px; border-radius: 4px; border: 1px solid #00ffff; background-color: rgba(255, 255, 255, 0.1); color: #fff; margin-bottom: 15px; resize: vertical; max-height: 150px;"></textarea>
-        <button id="analyzeButton" style="width: 100%; padding: 10px; background-color: #00ffff; color: #141414; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer;">Analyze Sentiment</button>
-        <div id="loadingSpinner" class="spinner hidden" style="margin: 15px auto; border: 5px solid #f3f3f3; border-top: 5px solid #00ffff; border-radius: 50%; width: 30px; height: 30px; animation: spin 2s linear infinite; display: none; opacity: 0; transition: opacity 0.3s ease;"></div>
-        <div id="result" class="hidden" style="text-align: center; margin-top: 10px;">
+        <textarea id="inputText" class="input-text" rows="4" placeholder="Enter your text..."></textarea>
+        <button id="analyzeButton" class="analyze-button">Analyze Sentiment</button>
+        <div id="loadingSpinner" class="spinner hidden"></div>
+        <div id="result" class="hidden">
             <p>Model Used: <span id="modelUsed"></span></p>
             <p class="sentiment-label">Sentiment: <span id="sentimentResult"></span></p>
             <p>Confidence: <span id="confidence"></span>%</p>
@@ -82,11 +65,8 @@ function createFloatingPanel() {
         panelActive = false;
     });
 
-    document.getElementById('minimizePanel').addEventListener('click', () => {
-        togglePanelMinimize();
-    });
+    document.getElementById('minimizePanel').addEventListener('click', togglePanelMinimize);
 
-    // Add event listener for sentiment analysis
     document.getElementById('analyzeButton').addEventListener('click', analyzeSentiment);
 }
 
@@ -119,7 +99,6 @@ function analyzeSentiment() {
     const loadingSpinner = document.getElementById('loadingSpinner');
     const analyzeButton = document.getElementById('analyzeButton');
 
-    // Error if no text entered
     if (text === '') {
         resultDiv.innerHTML = '<p style="color: red;">Please enter some text!</p>';
         resultDiv.classList.remove('hidden');
@@ -137,28 +116,18 @@ function analyzeSentiment() {
     // Fetch sentiment analysis result
     fetch('https://x-vibes.onrender.com/predict', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text, model: selectedModel })
     })
     .then(response => response.json())
     .then(data => {
-        // Display the results
         resultDiv.classList.remove('hidden');
         document.getElementById('modelUsed').textContent = data.model_used;
         document.getElementById('sentimentResult').textContent = data.result.label;
         document.getElementById('confidence').textContent = (data.result.score * 100).toFixed(2);
 
-        // Color the sentiment label based on result
         const sentimentResult = document.getElementById('sentimentResult');
-        if (data.result.label === 'POSITIVE') {
-            sentimentResult.style.color = 'green';
-        } else if (data.result.label === 'NEGATIVE') {
-            sentimentResult.style.color = 'red';
-        } else {
-            sentimentResult.style.color = 'goldenrod';
-        }
+        sentimentResult.style.color = data.result.label === 'POSITIVE' ? 'green' : data.result.label === 'NEGATIVE' ? 'red' : 'goldenrod';
     })
     .catch(error => {
         console.error('Error:', error);
@@ -166,32 +135,17 @@ function analyzeSentiment() {
         resultDiv.classList.remove('hidden');
     })
     .finally(() => {
-        // Hide the spinner and enable UI elements
         loadingSpinner.style.opacity = '0';
-        setTimeout(() => loadingSpinner.style.display = 'none', 300); // Wait for transition to end
+        setTimeout(() => loadingSpinner.style.display = 'none', 300);
         analyzeButton.disabled = false;
         document.getElementById('inputText').disabled = false;
         document.getElementById('modelSelector').disabled = false;
     });
 }
 
-// Debounce function for responsive panel resizing
-function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func.apply(this, args);
-        };
-        timeout = setTimeout(later, wait);
-    };
-}
-
 // Adjust the panel layout on window resize
-window.addEventListener('resize', debounce(adjustPanelLayout, 250));
-
-function adjustPanelLayout() {
+window.addEventListener('resize', () => {
     if (floatingPanel) {
         floatingPanel.style.maxHeight = `${window.innerHeight * 0.8}px`;
     }
-}
+});

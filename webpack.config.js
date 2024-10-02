@@ -3,8 +3,7 @@ const path = require('path');
 module.exports = {
   mode: 'development',  // Switch to 'production' for production builds
   entry: {
-    background: './src/background.js',
-    contentScript: './src/contentScript.js'
+    contentScript: './content/contentScript.js'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),

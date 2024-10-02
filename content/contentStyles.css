@@ -1,0 +1,89 @@
+.floating-panel {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    max-width: 90vw;
+    max-height: 80vh;
+    background-color: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(0, 255, 255, 0.5);
+    border-radius: 12px;
+    padding: 15px;
+    z-index: 2147483647;
+    box-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+    font-family: 'Roboto', Arial, sans-serif;
+    color: #fff;
+    overflow: hidden;
+    transition: transform 0.3s ease, opacity 0.3s ease, height 0.3s ease, padding 0.3s ease;
+}
+
+.panel-header {
+    text-align: right;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.panel-button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    color: #fff;
+    cursor: pointer;
+}
+
+.panel-title {
+    color: #00ffff;
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    text-shadow: 0 0 5px rgba(0, 255, 255, 0.8);
+    display: block;
+}
+
+.model-selector, .input-text {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: 1px solid #00ffff;
+    border-radius: 5px;
+}
+
+.analyze-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #00ffff;
+    color: #141414;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.analyze-button:hover {
+    background-color: #00e6b8;
+}
+
+.spinner {
+    margin: 15px auto;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #00ffff;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 2s linear infinite;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.hidden {
+    display: none;
+}
