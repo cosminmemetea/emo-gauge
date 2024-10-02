@@ -1,123 +1,70 @@
-# EmoGauge
+# EmoGauge - Sentiment Analysis Extension
 
-**EmoGauge** is a groundbreaking tool designed to help **freelancers**, **solopreneurs**, and **recruiters** become more self-aware of the emotional impact of their writing. In today's fast-paced digital communication landscape, the way we convey emotions can have a profound effect on relationships, business outcomes, and personal growth. EmoGauge offers real-time sentiment analysis of written content, helping you understand not only how your words are perceived but also how your emotional expression evolves over time.
+EmoGauge is a groundbreaking sentiment analysis tool designed to help solopreneurs, freelancers, recruiters, and digital professionals understand the emotional tone of their writing in real-time. EmoGauge integrates various sentiment analysis models to provide insightful feedback on written content, empowering users to communicate more effectively and become more self-aware.
 
-## Why EmoGauge?
+## Features
+- **Real-time Sentiment Analysis**: Analyze the emotional tone (positive, neutral, negative) of text input across websites.
+- **Model Selection**: Choose from various pre-trained sentiment models like DistilBERT, BERT, and RoBERTa.
+- **Futuristic UI**: Modern and minimalistic nano-transparent user interface.
+- **Floating Panel**: A floating sentiment analysis panel that can be minimized and closed at will.
+- **Cross-Platform Compatibility**: Works across various websites, including forms and input fields (tested on GitHub, Render, DockerHub).
 
-### 1. **Boost Your Self-Awareness Through Writing**
-   Writing is a reflection of our internal state, and the emotions we express can influence the outcomes of our professional interactions. **EmoGauge** helps you understand the emotional tone behind your words, so you can be more mindful in your communications. Whether you're sending client proposals, job applications, or negotiating contracts, knowing how your message comes across can be the difference between success and missed opportunities.
+## Getting Started
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
 
-### 2. **Monitor Your Growth in Emotional Intelligence**
-   EmoGauge doesn't just stop at analyzing single messages. It tracks your writing habits over time, giving you the ability to see how your emotional self-awareness evolves. This is especially valuable for professionals who want to fine-tune their tone in business communication and build stronger, more empathetic relationships.
+### Prerequisites
+- Node.js: Make sure you have Node.js installed on your machine. 
+- Git: Ensure Git is installed to clone the repository.
 
-### 3. **Tailored for Professionals Who Communicate with Impact**
-   - **Freelancers & Solopreneurs**: Stand out by refining the emotional impact of your proposals, emails, and social media content. Increase client retention by ensuring your messages are aligned with positive, constructive tones.
-   - **Recruiters & HR Professionals**: Gain insights into the emotional undertones of candidate communication, making better-informed decisions during recruitment and talent acquisition. Understand how job descriptions or feedback emails might be interpreted by candidates.
+## Installation
+### 1. Clone the Repository
 
-## Key Features
+Open your terminal or command prompt and run the following command to clone the repository from GitHub:
 
-- **Real-Time Sentiment Analysis**: Analyze the sentiment (positive, negative, neutral) of your written content to see how it might be perceived by others.
-- **Track Emotional Trends**: Monitor how your tone evolves over time and identify patterns in your writing.
-- **Actionable Insights**: Get recommendations on how to adjust your language to communicate more effectively and empathetically.
-- **Easy Integration**: Use EmoGauge directly in your browser (Chrome/Brave) for seamless, on-the-go analysis while you're writing.
+```
+git clone https://github.com/cosminmemetea/emo-gauge.git
+```
 
-## Who Should Use EmoGauge?
+Navigate into the project directory:
 
-### Freelancers and Solopreneurs:
-- **Maximize Client Engagement**: Ensure your pitches, proposals, and updates always carry the right tone.
-- **Improve Feedback Loops**: Communicate better with clients by understanding how feedback can be framed for positive outcomes.
+```cd emo-gauge```
 
-### Recruiters:
-- **Assess Candidates Better**: Use sentiment insights to gauge how candidates communicate during the hiring process.
-- **Refine Your Own Messaging**: Ensure your job descriptions and emails resonate positively with potential hires.
+### 2. Initialize the Project
 
-## The EmoGauge Difference
+Initialize the project using npm:
 
-While there are plenty of sentiment analysis tools out there, EmoGauge is uniquely positioned as a **self-awareness monitoring tool**. Instead of offering generic sentiment results, EmoGauge helps you **track emotional intelligence** over time, giving you the tools you need to improve not just your messaging but also your **interpersonal effectiveness**.
+```npm init -y```
 
-## How It Works
+### 3. Install Dependencies
 
-1. Install EmoGauge as a Chrome/Brave extension.
-2. Type or paste your text into any text field.
-3. Click the **Analyze Sentiment** button.
-4. Receive real-time feedback on the emotional tone of your writing.
-5. Track your performance and emotional growth over time through dashboards and detailed insights.
+Install the required dependencies:
 
 
-├── public/
-│   ├── icons/
-│   │   └── icon16.png
-│   │   └── icon48.png
-│   │   └── icon128.png
-│   ├── popup.html
-│   └── styles.css
-├── src/
-│   ├── background.ts
-│   ├── contentScript.ts
-│   ├── popup.ts
-├── manifest.json
-├── tsconfig.json
-├── package.json
-└── README.md
+```npm install webpack webpack-cli babel-loader @babel/core @babel/preset-env style-loader css-loader```
 
-npm init -y
-npm install typescript axios
-npm install --save-dev webpack webpack-cli ts-loader
-npm install --save-dev @types/chrome
-npm install --save-dev @types/axios
- npx webpack 
+### 4. Build the Project
+
+Use Webpack to bundle the JavaScript and CSS files. Run the following command to compile the code:
 
 
-   function analyzeSentiment() {
-    const text = document.getElementById('inputText').value.trim();
-    const selectedModel = document.getElementById('modelSelector').value;
-    const resultDiv = document.getElementById('result');
-    const loadingSpinner = document.getElementById('loadingSpinner');
+```npx webpack```
+This will generate the bundled files in the dist folder.
 
-    if (text === '') {
-      resultDiv.innerHTML = '<p style="color: red;">Please enter some text!</p>';
-      resultDiv.classList.remove('hidden');
-      return;
-    }
+## Running EmoGauge in Chrome/Brave
+Now that you have the extension built, you can load it into Chrome or Brave for testing.
 
-    loadingSpinner.classList.remove('hidden');
-    resultDiv.classList.add('hidden');
-    document.getElementById('analyzeButton').disabled = true;
-    document.getElementById('inputText').disabled = true;
-    document.getElementById('modelSelector').disabled = true;
+### 1. Load the Extension in Chrome/Brave
 
-    fetch('https://x-vibes.onrender.com/predict', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'accept': 'application/json'
-      },
-      body: JSON.stringify({text, model: selectedModel})
-    })
-    .then(response => {
-      if (!response.ok) throw new Error('Network response was not ok');
-      return response.json();
-    })
-    .then(data => {
-      loadingSpinner.classList.add('hidden');
-      resultDiv.classList.remove('hidden');
-      document.getElementById('modelUsed').textContent = data.model_used;
-      document.getElementById('sentimentResult').textContent = data.result.label;
-      document.getElementById('confidence').textContent = (data.result.score * 100).toFixed(2);
+- Open Chrome or Brave and navigate to the chrome://extensions/ page.
+- Enable Developer mode in the top-right corner.
+- Click on "Load unpacked" and select the project’s directory where you cloned the project (emo-gauge).
+- Your extension should now appear in the list and be active.
+### 2. Activate EmoGauge
 
-      const sentimentResult = document.getElementById('sentimentResult');
-      if (data.result.label === 'POSITIVE') sentimentResult.style.color = 'green';
-      else if (data.result.label === 'NEGATIVE') sentimentResult.style.color = 'red';
-      else sentimentResult.style.color = 'goldenrod';
-    })
-    .catch(error => {
-      resultDiv.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
-      resultDiv.classList.remove('hidden');
-    })
-    .finally(() => {
-      loadingSpinner.classList.add('hidden');
-      document.getElementById('analyzeButton').disabled = false;
-      document.getElementById('inputText').disabled = false;
-      document.getElementById('modelSelector').disabled = false;
-    });
-  }
+- Click on the EmoGauge extension icon in the Chrome/Brave toolbar to bring up the popup.
+- Click the "Toggle EmoGauge Panel" button to display the floating sentiment analysis panel.
+- Use the sentiment analysis panel on any web page by typing text into the input field and clicking "Analyze Sentiment".
+
+Contributing
+We welcome contributions! If you’d like to help improve EmoGauge, please fork the repository and submit a pull request. If you find any issues, feel free to report them on the GitHub Issues page.
+
