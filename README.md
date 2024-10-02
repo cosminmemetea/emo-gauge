@@ -66,3 +66,58 @@ npm install --save-dev webpack webpack-cli ts-loader
 npm install --save-dev @types/chrome
 npm install --save-dev @types/axios
  npx webpack 
+
+
+   function analyzeSentiment() {
+    const text = document.getElementById('inputText').value.trim();
+    const selectedModel = document.getElementById('modelSelector').value;
+    const resultDiv = document.getElementById('result');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    if (text === '') {
+      resultDiv.innerHTML = '<p style="color: red;">Please enter some text!</p>';
+      resultDiv.classList.remove('hidden');
+      return;
+    }
+
+    loadingSpinner.classList.remove('hidden');
+    resultDiv.classList.add('hidden');
+    document.getElementById('analyzeButton').disabled = true;
+    document.getElementById('inputText').disabled = true;
+    document.getElementById('modelSelector').disabled = true;
+
+    fetch('https://x-vibes.onrender.com/predict', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'accept': 'application/json'
+      },
+      body: JSON.stringify({text, model: selectedModel})
+    })
+    .then(response => {
+      if (!response.ok) throw new Error('Network response was not ok');
+      return response.json();
+    })
+    .then(data => {
+      loadingSpinner.classList.add('hidden');
+      resultDiv.classList.remove('hidden');
+      document.getElementById('modelUsed').textContent = data.model_used;
+      document.getElementById('sentimentResult').textContent = data.result.label;
+      document.getElementById('confidence').textContent = (data.result.score * 100).toFixed(2);
+
+      const sentimentResult = document.getElementById('sentimentResult');
+      if (data.result.label === 'POSITIVE') sentimentResult.style.color = 'green';
+      else if (data.result.label === 'NEGATIVE') sentimentResult.style.color = 'red';
+      else sentimentResult.style.color = 'goldenrod';
+    })
+    .catch(error => {
+      resultDiv.innerHTML = `<p style="color: red;">An error occurred: ${error.message}</p>`;
+      resultDiv.classList.remove('hidden');
+    })
+    .finally(() => {
+      loadingSpinner.classList.add('hidden');
+      document.getElementById('analyzeButton').disabled = false;
+      document.getElementById('inputText').disabled = false;
+      document.getElementById('modelSelector').disabled = false;
+    });
+  }
